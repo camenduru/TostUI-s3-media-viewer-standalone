@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S3 Media Viewer</title>
+    <title>Tost UI - S3 Media Viewer</title>
+    <link rel="icon" href="https://ui.tost.ai/favicon.ico">
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
     <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
     <script type="importmap">
@@ -665,6 +666,62 @@
             refreshFiles();
         });
 
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            // Don't navigate when typing in input fields
+            if (e.target.tagName === 'INPUT') return;
+
+            const filterTypes = ['all', 'image', 'video', 'audio', 'model3d'];
+            const currentFilterIndex = filterTypes.indexOf(currentFilter);
+
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                const nextIndex = (currentFilterIndex + 1) % filterTypes.length;
+                setFilter(filterTypes[nextIndex]);
+                return;
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                const prevIndex = (currentFilterIndex - 1 + filterTypes.length) % filterTypes.length;
+                setFilter(filterTypes[prevIndex]);
+                return;
+            }
+
+            if (!currentFile || files.length === 0) return;
+
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = files.filter(f => {
+                const matchesSearch = f.name.toLowerCase().includes(search);
+                const matchesType = currentFilter === 'all' || f.type === currentFilter;
+                return matchesSearch && matchesType;
+            });
+
+            const currentIndex = filtered.findIndex(f => f.key === currentFile.key);
+            if (currentIndex === -1) return;
+
+            if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                const nextIndex = currentIndex + 1;
+                if (nextIndex < filtered.length) {
+                    selectFile(encodeURIComponent(filtered[nextIndex].key));
+                    scrollToFile(filtered[nextIndex].key);
+                }
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                const prevIndex = currentIndex - 1;
+                if (prevIndex >= 0) {
+                    selectFile(encodeURIComponent(filtered[prevIndex].key));
+                    scrollToFile(filtered[prevIndex].key);
+                }
+            }
+        });
+
+        function scrollToFile(key) {
+            const fileEl = document.querySelector(`.file-item[onclick*="${encodeURIComponent(key)}"]`);
+            if (fileEl) {
+                fileEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
         function setFilter(type) {
             currentFilter = type;
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
@@ -808,7 +865,7 @@
                         <div class="file-icon ${f.type}">${getFileIcon(f.type)}</div>
                         <div class="file-info">
                             <div class="file-name"><span class="name-part">${name}</span><span class="ext-part">${ext}</span></div>
-                            <div class="file-meta">${formatSize(f.size)}</div>
+                            <div class="file-meta">${formatSize(f.size)} · ${formatDate(f.lastModified)}</div>
                         </div>
                     </div>
                 `;
@@ -1191,7 +1248,7 @@
 
         // Utilities
         function getFileIcon(type) {
-            const icons = { image: '🖼', video: '🎬', audio: '🎵', document: '📄', model3d: '🎲', other: '📁' };
+            const icons = { image: '🖼️', video: '🎬', audio: '🎵', document: '📄', model3d: '🧊', other: '📁' };
             return icons[type] || icons.other;
         }
 
@@ -1201,6 +1258,24 @@
             const sizes = ['B', 'KB', 'MB', 'GB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diff = now - date;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+            if (days === 0) {
+                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            } else if (days === 1) {
+                return 'Yesterday';
+            } else if (days < 7) {
+                return date.toLocaleDateString([], { weekday: 'short' });
+            } else {
+                return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+            }
         }
 
         function formatTime(seconds) {
