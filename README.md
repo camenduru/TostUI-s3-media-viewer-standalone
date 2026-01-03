@@ -2,9 +2,9 @@
 
 A simple web-based media viewer for S3-compatible storage (MinIO, AWS S3, DigitalOcean Spaces, etc.).
 
-![Screenshot 2026-01-03 031304](https://github.com/user-attachments/assets/e4438435-e8e4-45c8-8689-2fcc5cfecfcc)
+![Screenshot 2026-01-03 031304](https://github.com/user-attachments/assets/eb283219-60d4-4f9c-86ce-8d2fa3afe6d2)
 
-![Screenshot 2026-01-03 031819](https://github.com/user-attachments/assets/8ac3c1e0-db63-4613-9773-d92922444784)
+![Screenshot 2026-01-03 031819](https://github.com/user-attachments/assets/4e8d56ab-2cda-4b8c-ab73-dd4b3a90fbac)
 
 ## Features
 
