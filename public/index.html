@@ -751,6 +751,19 @@
                     scrollToFile(filtered[prevIndex].key);
                 }
             }
+
+            // Image zoom controls
+            if (currentFile && currentFile.type === 'image') {
+                if (e.key === '+') {
+                    e.preventDefault();
+                    imageTransform.scale = Math.max(0.1, Math.min(10, imageTransform.scale * 1.1));
+                    updateImageTransform();
+                } else if (e.key === '-') {
+                    e.preventDefault();
+                    imageTransform.scale = Math.max(0.1, Math.min(10, imageTransform.scale * 0.9));
+                    updateImageTransform();
+                }
+            }
         });
 
         function scrollToFile(key) {
