@@ -687,7 +687,7 @@
             if (isDragging) {
                 const dx = e.clientX - dragStart.x;
                 const dy = e.clientY - dragStart.y;
-                const sensitivity = 0.5;
+                const sensitivity = 0.8 / imageTransform.scale;
                 imageTransform.x += dx * sensitivity;
                 imageTransform.y += dy * sensitivity;
                 dragStart = { x: e.clientX, y: e.clientY };
