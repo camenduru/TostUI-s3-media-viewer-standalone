@@ -213,14 +213,16 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
+            position: relative;
         }
 
         .image-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
+            position: absolute;
+            top: 50%;
+            left: 50%;
             cursor: grab;
             user-select: none;
+            transform-origin: center;
         }
 
         .image-container img:active {
@@ -429,6 +431,19 @@
             flex-direction: column;
             align-items: center;
             gap: 12px;
+        }
+
+        .image-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            color: #888;
+            font-size: 12px;
         }
 
         .model-loading-spinner {
@@ -667,6 +682,22 @@
         let dragStart = { x: 0, y: 0 };
         let mediaEl = null;
         let currentFilter = 'all';
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const dx = e.clientX - dragStart.x;
+                const dy = e.clientY - dragStart.y;
+                const sensitivity = 0.5;
+                imageTransform.x += dx * sensitivity;
+                imageTransform.y += dy * sensitivity;
+                dragStart = { x: e.clientX, y: e.clientY };
+                updateImageTransform();
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
 
         document.addEventListener('DOMContentLoaded', () => {
             loadConfig();
@@ -944,9 +975,45 @@
         function renderImageViewer(file, content) {
             content.innerHTML = `
                 <div class="image-container" id="imgContainer">
-                    <img src="${file.url}" alt="${file.name}" id="viewerImg">
+                    <div class="image-loading" id="imageLoading">
+                        <div class="loading-spinner"></div>
+                        <span>Loading image...</span>
+                    </div>
+                    <img src="${file.url}" alt="${file.name}" id="viewerImg" style="display:none">
                 </div>
             `;
+
+            const img = document.getElementById('viewerImg');
+            img.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? 0.9 : 1.1;
+                imageTransform.scale = Math.max(0.1, Math.min(10, imageTransform.scale * delta));
+                updateImageTransform();
+            });
+            img.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                isDragging = true;
+                dragStart = { x: e.clientX, y: e.clientY };
+            });
+
+            img.onload = () => {
+                const container = document.getElementById('imgContainer');
+                const containerWidth = container.clientWidth;
+                const containerHeight = container.clientHeight;
+                const scaleX = containerWidth / img.naturalWidth;
+                const scaleY = containerHeight / img.naturalHeight;
+                imageTransform.scale = Math.min(scaleX, scaleY);
+                updateImageTransform();
+                document.getElementById('imageLoading').style.display = 'none';
+                img.style.display = 'block';
+            };
+        }
+
+        function updateImageTransform() {
+            const img = document.getElementById('viewerImg');
+            if (img) {
+                img.style.transform = `translate(-50%, -50%) scale(${imageTransform.scale}) translate(${imageTransform.x}px, ${imageTransform.y}px)`;
+            }
         }
 
         // Video Viewer
