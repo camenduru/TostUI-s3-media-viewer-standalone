@@ -8,13 +8,24 @@ A simple web-based media viewer for S3-compatible storage (MinIO, AWS S3, Digita
 
 ## Features
 
-- Browse files from S3 buckets
-- View images, videos, and audio files
-- View 3D models (glb, gltf, fbx, obj, dae, 3ds)
-- View PLY point cloud/mesh files
-- Filter files by type
+- Browse and view files from S3-compatible storage (AWS S3, MinIO, DigitalOcean Spaces, etc.)
+- Support for multiple file types: images, videos, audio, 3D models, and documents
+- Filter files by type (All, Images, Videos, Audio, 3D)
 - Search files by name
-- Dark theme UI
+- Keyboard navigation (arrow keys for file navigation, filter switching, and image zoom)
+- Image viewer with zoom (mouse wheel) and pan (drag) controls
+- Video player with custom controls (play/pause, progress bar, volume control, mute)
+- Audio player with custom controls (play/pause, skip forward/backward, progress bar)
+- 3D model viewer using Google Model Viewer (with AR support for mobile devices)
+- PLY point cloud/mesh viewer using Three.js (orbit controls, wireframe toggle, reset view)
+- Document viewer (open text files in new tab, download other document types)
+- Signed URLs with 24-hour expiration for secure temporary access
+- Web-based configuration interface (settings modal for S3 credentials and options)
+- Local storage persistence for configuration
+- Responsive dark theme UI
+- Loading states and error handling
+- File metadata display (file size, last modified date)
+- Bucket switching and prefix support for folder navigation
 
 ## Getting Started
 
